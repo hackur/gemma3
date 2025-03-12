@@ -17,6 +17,7 @@ This project provides a fully OpenAI-compatible API server for the Gemma 3 model
 - [API Reference](#api-reference)
 - [Performance Considerations](#performance-considerations)
 - [Troubleshooting](#troubleshooting)
+- [Test Suite](#test-suite)
 
 ## Features
 
@@ -253,3 +254,27 @@ The server implements the following OpenAI API endpoints:
 - Verify the server is running and accessible at the specified host and port
 - Check that your client is using the correct base URL
 - Ensure you're providing an API key (any string will work)
+
+## Test Suite
+
+A test suite is provided in the `tests` directory to evaluate the server's performance and limitations under different configurations.
+
+### Running the Tests
+
+```bash
+python tests/context_size_test.py --model_path /path/to/your/model.gguf --n_gpu_layers -1
+```
+
+### Test Parameters
+
+- `--model_path`: Path to the GGUF model file (required)
+- `--n_gpu_layers`: Number of GPU layers to use (-1 for all)
+- `--context_length`: Context length for the server (default: 2048)
+- `--max_tokens`: Maximum tokens for the response (default: 128)
+- `--prompt_size`: Size of the prompt in characters (default: 1024)
+- `--num_tests`: Number of test iterations (default: 5)
+- `--output_file`: Path to save the test results (default: `test_results.json`)
+- `--host`: Server host (default: 127.0.0.1)
+- `--port`: Server port (default: 8000)
+
+The test script will start the server with the specified configuration, send requests with varying prompt sizes and `max_tokens`, and record the response times and any errors. The results will be saved to the specified output file in JSON format.
