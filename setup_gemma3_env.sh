@@ -10,6 +10,14 @@ if ! command -v uv &> /dev/null; then
     export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
+# Check for Hugging Face token
+if [ -z "$HF_TOKEN" ]; then
+    echo "Warning: Hugging Face token (HF_TOKEN) is not set."
+    echo "Some Gemma 3 models may require authentication."
+    echo "If you encounter issues, set the HF_TOKEN environment variable."
+    echo "For example: export HF_TOKEN=your_hugging_face_token"
+fi
+
 # Create virtual environment
 echo "Creating virtual environment with uv..."
 uv venv .venv

@@ -10,6 +10,8 @@ Gemma 3 models require a specialized version of the transformers library. This r
 git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
 ```
 
+Some Gemma 3 models may require authentication with a Hugging Face API token.
+
 ## Contents
 
 - `requirements.txt` - All required dependencies for working with Gemma 3 models
@@ -25,6 +27,7 @@ git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
 - Python 3.9+ installed
 - Git (for cloning this repository)
 - Internet connection (for downloading models and dependencies)
+- (Optional) Hugging Face API token (for accessing gated models)
 
 ### Quick Setup
 
@@ -44,6 +47,7 @@ This script will:
 2. Create a virtual environment
 3. Install all required dependencies (including the specialized transformers version)
 4. Verify the installation
+5. Check for the presence of the `HF_TOKEN` environment variable
 
 ### Manual Setup
 
@@ -62,6 +66,26 @@ source .venv/bin/activate
 # Install dependencies
 uv pip install -r requirements.txt
 ```
+
+### Hugging Face API Token
+
+Some Gemma 3 models may require authentication with a Hugging Face API token. You can obtain a token from your Hugging Face account settings: [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+
+You can provide the token in two ways:
+
+1. **Environment Variable (Recommended)**: Set the `HF_TOKEN` environment variable:
+
+   ```bash
+   export HF_TOKEN=your_hugging_face_token
+   ```
+
+2. **Command-Line Argument**: Use the `--token` argument when running `gemma3_example.py`:
+
+   ```bash
+   python gemma3_example.py --token your_hugging_face_token
+   ```
+
+The setup script will check for the `HF_TOKEN` environment variable and provide a warning if it's not set.
 
 ## Using Gemma 3 Models
 
@@ -101,6 +125,9 @@ python gemma3_example.py --max_tokens 1024 --temperature 0.9 --top_p 0.95
 
 # Change quantization level
 python gemma3_example.py --quantize 8bit  # Options: 4bit, 8bit, none
+
+# Provide Hugging Face token (if not using HF_TOKEN environment variable)
+python gemma3_example.py --token your_hugging_face_token
 ```
 
 ## Available Models
@@ -140,10 +167,15 @@ Here's a simple example of how to use Gemma 3 in your own Python code:
 ```python
 import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+import os
 
 # Load tokenizer and model
 model_name = "google/gemma-3-8b"  # or "google/gemma-3-27b" or "google/gemma-3-1b-it"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+# Get Hugging Face token from environment variable
+hf_token = os.environ.get("HF_TOKEN")
+
+tokenizer = AutoTokenizer.from_pretrained(model_name, token=hf_token)
 
 # Use 4-bit quantization for efficiency
 model = AutoModelForCausalLM.from_pretrained(
@@ -155,6 +187,7 @@ model = AutoModelForCausalLM.from_pretrained(
         bnb_4bit_compute_dtype=torch.bfloat16,
         bnb_4bit_quant_type="nf4",
     ),
+    token=hf_token,
 )
 
 # Generate text
@@ -187,9 +220,15 @@ print(response)
    - Ensure you're using GPU acceleration if available
 
 3. **Installation Problems**
+
    - Make sure you're using the specialized transformers version
    - Check that all dependencies are installed correctly
    - Verify that your Python version is 3.9 or higher
+
+4. **Authentication Errors**
+   - Ensure you have a valid Hugging Face API token
+   - Set the `HF_TOKEN` environment variable correctly
+   - Use the `--token` argument when running the example script
 
 ### Getting Help
 

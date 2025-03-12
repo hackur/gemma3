@@ -8,13 +8,28 @@ import torch
 from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 import time
 import argparse
+import os
 
 def main(args):
     print(f"Loading Gemma 3 model: {args.model}")
     start_time = time.time()
     
+    # Get Hugging Face token from environment variable or command line
+    hf_token = args.token or os.environ.get("HF_TOKEN")
+    if not hf_token and args.require_token:
+        raise ValueError(
+            "Hugging Face token is required but not provided. "
+            "Either set the HF_TOKEN environment variable or use the --token argument."
+        )
+    
+    if hf_token:
+        print("Using Hugging Face token for authentication")
+    
     # Load tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(args.model)
+    tokenizer = AutoTokenizer.from_pretrained(
+        args.model,
+        token=hf_token,
+    )
     
     # Configure model loading based on quantization option
     if args.quantize == "4bit":
@@ -28,6 +43,7 @@ def main(args):
                 bnb_4bit_compute_dtype=torch.bfloat16,
                 bnb_4bit_quant_type="nf4",
             ),
+            token=hf_token,
         )
     elif args.quantize == "8bit":
         print("Using 8-bit quantization")
@@ -35,6 +51,7 @@ def main(args):
             args.model,
             device_map="auto",
             load_in_8bit=True,
+            token=hf_token,
         )
     else:
         print("Using full precision (bfloat16)")
@@ -42,6 +59,7 @@ def main(args):
             args.model,
             device_map="auto",
             torch_dtype=torch.bfloat16,
+            token=hf_token,
         )
     
     load_time = time.time() - start_time
@@ -86,6 +104,10 @@ if __name__ == "__main__":
                         help="Top-p sampling parameter")
     parser.add_argument("--quantize", type=str, choices=["4bit", "8bit", "none"],
                         default="4bit", help="Quantization level")
+    parser.add_argument("--token", type=str, default=None,
+                        help="Hugging Face API token (can also use HF_TOKEN environment variable)")
+    parser.add_argument("--require_token", action="store_true",
+                        help="Require Hugging Face token (will fail if not provided)")
     
     args = parser.parse_args()
     main(args)
