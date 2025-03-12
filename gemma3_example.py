@@ -75,7 +75,7 @@ def generate_text_huggingface(model, tokenizer, prompt, max_tokens, temperature,
     response = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
     return response, gen_time
 
-def generate_text_gguf(model, prompt, max_tokens, temperature, top_p):
+def generate_text_gguf(model, prompt, max_tokens, temperature, top_p, top_k, min_p, repeat_penalty):
     """Generates text using a llama_cpp model."""
     gen_start = time.time()
     output = model(
@@ -83,6 +83,9 @@ def generate_text_gguf(model, prompt, max_tokens, temperature, top_p):
         max_tokens=max_tokens,
         temperature=temperature,
         top_p=top_p,
+        top_k=top_k,
+        min_p=min_p,
+        repeat_penalty=repeat_penalty,
         echo=False,
     )
     gen_time = time.time() - gen_start
@@ -101,14 +104,49 @@ def main(args):
     if args.local_model:
         model, tokenizer = load_gguf_model(args.local_model, args.n_gpu_layers, args.context_length)
         generate_fn = generate_text_gguf
+        # Unsloth's recommended parameters for Gemma 3
+        default_temperature = 1.0
+        default_top_k = 64
+        default_top_p = 0.95
+        default_min_p = 0.01  # or 0.0
+        default_repeat_penalty = 1.0
     else:
         model, tokenizer = load_huggingface_model(args.model, hf_token, args.quantize)
         generate_fn = generate_text_huggingface
+        default_temperature = 0.7
+        default_top_k = None
+        default_top_p = 0.9
+        default_min_p = None
+        default_repeat_penalty = None
 
-    prompt = args.prompt
+    # Apply Unsloth's recommended chat template (remove <bos> for GGUF)
+    if args.local_model:
+      prompt = f"<start_of_turn>user\n{args.prompt}<end_of_turn>\n<start_of_turn>model\n"
+    else:
+      prompt = f"<bos><start_of_turn>user\n{args.prompt}<end_of_turn>\n<start_of_turn>model\n"
+
     print(f"\nPrompt: {prompt}")
 
-    response, gen_time = generate_fn(model, tokenizer, prompt, args.max_tokens, args.temperature, args.top_p)
+    if args.local_model:
+        response, gen_time = generate_fn(
+            model,
+            prompt,
+            args.max_tokens,
+            args.temperature if args.temperature is not None else default_temperature,
+            args.top_p if args.top_p is not None else default_top_p,
+            args.top_k if args.top_k is not None else default_top_k,
+            args.min_p if args.min_p is not None else default_min_p,
+            args.repeat_penalty if args.repeat_penalty is not None else default_repeat_penalty,
+        )
+    else:
+        response, gen_time = generate_fn(
+            model,
+            tokenizer,
+            prompt,
+            args.max_tokens,
+            args.temperature if args.temperature is not None else default_temperature,
+            args.top_p if args.top_p is not None else default_top_p,
+        )
 
     print("\nResponse:")
     print(response)
@@ -127,10 +165,16 @@ if __name__ == "__main__":
                         help="Prompt for text generation")
     parser.add_argument("--max_tokens", type=int, default=512,
                         help="Maximum number of tokens to generate")
-    parser.add_argument("--temperature", type=float, default=0.7,
-                        help="Temperature for sampling")
-    parser.add_argument("--top_p", type=float, default=0.9,
-                        help="Top-p sampling parameter")
+    parser.add_argument("--temperature", type=float, default=None,
+                        help="Temperature for sampling (default: 0.7 for HF, 1.0 for GGUF)")
+    parser.add_argument("--top_p", type=float, default=None,
+                        help="Top-p sampling parameter (default: 0.9 for HF, 0.95 for GGUF)")
+    parser.add_argument("--top_k", type=int, default=None,
+                        help="Top-k sampling parameter (GGUF only, default: 64)")
+    parser.add_argument("--min_p", type=float, default=None,
+                        help="Min-p sampling parameter (GGUF only, default: 0.01)")
+    parser.add_argument("--repeat_penalty", type=float, default=None,
+                        help="Repetition penalty (GGUF only, default: 1.0)")
     parser.add_argument("--quantize", type=str, choices=["4bit", "8bit", "none"],
                         default="4bit", help="Quantization level (for Hugging Face models)")
     parser.add_argument("--token", type=str, default=None,

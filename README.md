@@ -128,7 +128,7 @@ python gemma3_example.py --token your_hugging_face_token
 
 ### Using Local GGUF Models
 
-To use a local GGUF model:
+To use a local GGUF model (like those from Unsloth):
 
 ```bash
 # Run with a local GGUF model
@@ -142,9 +142,41 @@ python gemma3_example.py --local_model /path/to/your/model.gguf --context_length
 
 # Use a custom prompt
 python gemma3_example.py --local_model /path/to/your/model.gguf --prompt "Write a short story"
+
+# Use Unsloth's recommended parameters (these are the defaults for GGUF)
+python gemma3_example.py --local_model /path/to/your/model.gguf --temperature 1.0 --top_k 64 --top_p 0.95 --min_p 0.01 --repeat_penalty 1.0
 ```
 
 **Note**: When using a local GGUF model, the `--model`, `--quantize`, and `--token` arguments are ignored.
+
+**Unsloth Recommended Parameters (for GGUF)**:
+
+- `--temperature 1.0`
+- `--top_k 64`
+- `--top_p 0.95`
+- `--min_p 0.01` (or `--min_p 0.0`)
+- `--repeat_penalty 1.0`
+
+These are set as defaults when using `--local_model`.
+
+**Chat Template (IMPORTANT)**:
+
+The Gemma 3 models use the following chat template:
+
+```jinja
+<start_of_turn>user
+YOUR PROMPT HERE<end_of_turn>
+<start_of_turn>model
+
+```
+
+**Do NOT include `<bos>` at the beginning when using GGUF models with llama.cpp, as it's automatically added.** For Hugging Face models, include `<bos>`. The example script handles this automatically.
+
+**Example (Flappy Bird)**:
+
+```bash
+python gemma3_example.py --local_model /Users/sarda/.lmstudio/models/unsloth/gemma-3-27b-it-GGUF/gemma-3-27b-it-Q4_K_M.gguf --prompt "Create a Flappy Bird game in Python. You must include these things:\n1. You must use pygame.\n2. The background color should be randomly chosen and is a light shade. Start with a light blue color.\n3. Pressing SPACE multiple times will accelerate the bird.\n4. The bird's shape should be randomly chosen as a square, circle or triangle. The color should be randomly chosen as a dark color.\n5. Place on the bottom some land colored as dark brown or yellow chosen randomly.\n6. Make a score shown on the top right side. Increment if you pass pipes and don't hit them.\n7. Make randomly spaced pipes with enough space. Color them randomly as dark green or light brown or a dark gray shade.\n8. When you lose, show the best score. Make the text inside the screen. Pressing q or Esc will quit the game. Restarting is pressing SPACE again.\nThe final game should be inside a markdown section in Python. Check your code for errors and fix them before the final markdown section." --n_gpu_layers -1
+```
 
 ## Available Models
 
@@ -158,7 +190,7 @@ Gemma 3 is available in different sizes on Hugging Face:
 
 ### GGUF Models
 
-You can find GGUF models for Gemma 3 on Hugging Face, often in repositories from users like TheBloke. You'll need to download these models separately.
+You can find GGUF models for Gemma 3 on Hugging Face, often in repositories from users like TheBloke and Unsloth. You'll need to download these models separately.
 
 ## Hardware Requirements
 
@@ -218,8 +250,8 @@ model = AutoModelForCausalLM.from_pretrained(
     token=hf_token,
 )
 
-# Generate text
-prompt = "Explain quantum computing in simple terms"
+# Generate text (include <bos> for HF models)
+prompt = "<bos><start_of_turn>user\nExplain quantum computing in simple terms<end_of_turn>\n<start_of_turn>model\n"
 inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
 outputs = model.generate(
     **inputs,
@@ -240,13 +272,16 @@ from llama_cpp import Llama
 model_path = "/path/to/your/model.gguf"
 model = Llama(model_path=model_path, n_gpu_layers=-1, n_ctx=2048) # Use -1 for all GPU layers
 
-# Generate text
-prompt = "Explain quantum computing in simple terms"
+# Generate text (do NOT include <bos> for GGUF models)
+prompt = "<start_of_turn>user\nExplain quantum computing in simple terms<end_of_turn>\n<start_of_turn>model\n"
 output = model(
     prompt,
     max_tokens=512,
-    temperature=0.7,
-    top_p=0.9,
+    temperature=1.0,  # Unsloth recommended
+    top_p=0.95,       # Unsloth recommended
+    top_k=64,         # Unsloth recommended
+    min_p=0.01,       # Unsloth recommended
+    repeat_penalty=1.0, # Unsloth recommended
     echo=False,
 )
 response = output["choices"][0]["text"]
@@ -286,8 +321,12 @@ print(response)
    - Use the `--token` argument when running the example script
 
 5. **Model Not Found Errors**
+
    - Double-check the model name (for Hugging Face models) or path (for GGUF models)
    - Make sure you've downloaded the GGUF model file
+
+6. **TypeError: generate_text_gguf() takes ... arguments but ... were given**
+   - Make sure you are using the latest version of `gemma3_example.py`. This error should be fixed.
 
 ### Getting Help
 
@@ -307,3 +346,4 @@ This project is provided as-is under the MIT License. The Gemma 3 models themsel
 - Hugging Face for providing model hosting and the transformers library
 - The uv team for creating an excellent environment management tool
 - The llama.cpp team for creating a powerful inference engine for GGUF models
+- Unsloth AI for providing optimized GGUF models and usage recommendations
