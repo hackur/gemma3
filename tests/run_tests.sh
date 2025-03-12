@@ -129,7 +129,7 @@ echo "Number of Tests: $NUM_TESTS"
 echo "Output File: $OUTPUT_FILE"
 echo ""
 
-# Run the tests
+# Run the tests, specifying the output file in the tests directory
 python tests/context_size_test.py \
   --model_path "$MODEL_PATH" \
   --n_gpu_layers "$N_GPU_LAYERS" \
@@ -137,9 +137,9 @@ python tests/context_size_test.py \
   --max_tokens "$MAX_TOKENS" \
   --prompt_size "$PROMPT_SIZE" \
   --num_tests "$NUM_TESTS" \
-  --output_file "$OUTPUT_FILE" \
+  --output_file "tests/$OUTPUT_FILE" \
   --host "$HOST" \
   --port "$PORT"
 
 echo ""
-echo "Tests completed. Results saved to $OUTPUT_FILE"
+echo "Tests completed. Results saved to tests/$OUTPUT_FILE"
