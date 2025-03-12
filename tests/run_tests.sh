@@ -20,9 +20,11 @@
 #   --host HOST            Server host
 #   --port PORT            Server port
 #   --help                 Display this help message
+#   --test_script SCRIPT   Specify the test script to run (e.g., context_size_test.py)
+#   --extra_args ARGS      Extra arguments to pass to the test script (quoted string)
 #
 # Example:
-#   ./run_tests.sh --model_path /path/to/model.gguf --n_gpu_layers -1 --context_length 4096 --max_tokens 512 --num_tests 10
+#   ./run_tests.sh --model_path /path/to/model.gguf --n_gpu_layers -1 --test_script context_size_test.py --extra_args "--context_length 4096 --max_tokens 512"
 #
 
 # Default configuration values
@@ -30,11 +32,13 @@ MODEL_PATH=""
 N_GPU_LAYERS=-1
 CONTEXT_LENGTH=2048
 MAX_TOKENS=128
-PROMPT_SIZE=1024
+PROMPT_SIZE=1024  # Default, will be overridden by specific tests if needed.
 NUM_TESTS=5
 OUTPUT_FILE="test_results.json"
 HOST="127.0.0.1"
 PORT=8000
+TEST_SCRIPT=""  # No default test script
+EXTRA_ARGS=""
 
 # Display usage information
 function show_usage {
@@ -50,10 +54,12 @@ function show_usage {
   echo "  --output_file PATH     Path to save the test results"
   echo "  --host HOST            Server host"
   echo "  --port PORT            Server port"
+  echo "  --test_script SCRIPT   Specify the test script to run (e.g., context_size_test.py)"
+  echo '  --extra_args ARGS      Extra arguments to pass to the test script (quoted string, e.g. "--arg1 val1 --arg2 val2")'
   echo "  --help                 Display this help message"
   echo ""
   echo "Example:"
-  echo "  $0 --model_path /path/to/model.gguf --n_gpu_layers -1 --context_length 4096 --max_tokens 512 --num_tests 10"
+  echo '  $0 --model_path /path/to/model.gguf --n_gpu_layers -1 --test_script context_size_test.py --extra_args "--context_length 4096 --max_tokens 512"'
   exit 1
 }
 
@@ -96,6 +102,14 @@ while [[ $# -gt 0 ]]; do
       PORT="$2"
       shift 2
       ;;
+    --test_script)
+      TEST_SCRIPT="$2"
+      shift 2
+      ;;
+    --extra_args)
+      EXTRA_ARGS="$2"
+      shift 2
+      ;;
     --help)
       show_usage
       ;;
@@ -118,19 +132,13 @@ if [ ! -f "$MODEL_PATH" ]; then
   exit 1
 fi
 
-# Run the tests
-echo "Running context size and configuration tests..."
-echo "Model path: $MODEL_PATH"
-echo "GPU Layers: $N_GPU_LAYERS"
-echo "Context Length: $CONTEXT_LENGTH"
-echo "Max Tokens: $MAX_TOKENS"
-echo "Prompt Size: $PROMPT_SIZE"
-echo "Number of Tests: $NUM_TESTS"
-echo "Output File: $OUTPUT_FILE"
-echo ""
+# Run the tests, specifying the output file in the tests directory and the test script
+if [ -z "$TEST_SCRIPT" ]; then
+  echo "Error: --test_script must be specified."
+  show_usage
+fi
 
-# Run the tests, specifying the output file in the tests directory
-uv run python tests/context_size_test.py \
+uv run python "tests/$TEST_SCRIPT" \
   --model_path "$MODEL_PATH" \
   --n_gpu_layers "$N_GPU_LAYERS" \
   --context_length "$CONTEXT_LENGTH" \
@@ -139,7 +147,8 @@ uv run python tests/context_size_test.py \
   --num_tests "$NUM_TESTS" \
   --output_file "tests/$OUTPUT_FILE" \
   --host "$HOST" \
-  --port "$PORT"
+  --port "$PORT" \
+  $EXTRA_ARGS
 
 echo ""
 echo "Tests completed. Results saved to tests/$OUTPUT_FILE"

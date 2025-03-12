@@ -37,8 +37,23 @@ This document outlines the tasks for creating a test suite to evaluate the perfo
             *   Success/failure status
             *   Error messages (if any)
         *   Save the report to a file (e.g., CSV, Markdown, JSON).
-4.  **Update `GEMMA3_SERVER_README.md`:**
+4.  **Update `GEMMA3_SERVER_README.md`:** (DONE)
     *   Add a section describing the test suite.
     *   Explain how to run the tests.
     *   Provide examples of usage.
-5. **Create shell script to run tests**
+5. **Create shell script to run tests** (DONE)
+6. **Create `tests/prompt_length_test.py`:**
+    * Test server's handling of increasingly long prompts.
+    * Measure response time and success/failure.
+    * Check for truncation or errors near the context limit.
+7. **Create `tests/repetition_test.py`:**
+    * Test model's tendency to repeat itself.
+    * Vary `repeat_penalty` and `temperature`.
+    * Analyze output for repetition patterns.
+8. **Create `tests/instruction_following_test.py`:**
+    * Test model's ability to follow specific instructions.
+    * Use prompts with constraints (e.g., length, format, content).
+    * Evaluate the accuracy and completeness of the responses.
+9. **Update `tests/run_tests.sh`:**
+    * Add options to run specific test scripts.
+    * Provide a way to run all tests.
