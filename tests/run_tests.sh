@@ -130,7 +130,7 @@ echo "Output File: $OUTPUT_FILE"
 echo ""
 
 # Run the tests, specifying the output file in the tests directory
-python tests/context_size_test.py \
+uv run python tests/context_size_test.py \
   --model_path "$MODEL_PATH" \
   --n_gpu_layers "$N_GPU_LAYERS" \
   --context_length "$CONTEXT_LENGTH" \

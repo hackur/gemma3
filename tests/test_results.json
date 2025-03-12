@@ -1,26 +1,38 @@
-[
-    {
-        "success": true,
-        "response_time": 6.455948114395142,
-        "prompt_tokens": 167,
-        "response_tokens": 109,
-        "response_content": "It appears you've sent a very long string of the letter \"a\".  While I can acknowledge it, there isn't much for me to *do* with just that. \n\nIs everything alright? Perhaps you accidentally hit a key repeatedly? If you meant to type something else, please try again!\n\nI am here to help if you have a question, want to brainstorm ideas, or need assistance with anything within my capabilities. Just let me know what you'd like to do.\n",
-        "error": null
+{
+    "server_config": {
+        "model_path": "/Users/sarda/.lmstudio/models/unsloth/gemma-3-27b-it-GGUF/gemma-3-27b-it-Q4_K_M.gguf",
+        "n_gpu_layers": -1,
+        "context_length": 2048,
+        "host": "127.0.0.1",
+        "port": 8000
     },
-    {
-        "success": true,
-        "response_time": 5.2936789989471436,
-        "prompt_tokens": 167,
-        "response_tokens": 89,
-        "response_content": "It appears you've sent a very long string of the letter \"a\".  Is there anything I can help you with? Perhaps you accidentally hit a key repeatedly, or were testing something. \n\nIf you *did* intend to send me a message, please retype it and I will do my best to understand and respond!  I'm here to assist you in any way I can.\n",
-        "error": null
-    },
-    {
-        "success": true,
-        "response_time": 4.324021100997925,
-        "prompt_tokens": 167,
-        "response_tokens": 73,
-        "response_content": "It appears you've sent a very long string of the letter \"a\". \n\nIs there anything specific you were trying to communicate? Perhaps you accidentally hit a key repeatedly?  I can try to help if you tell me what you intended, or I can simply acknowledge that I received this input.\n\nLet me know!\n",
-        "error": null
-    }
-]
+    "results": [
+        {
+            "success": true,
+            "response_time": 6.837889909744263,
+            "prompt_tokens": 167,
+            "response_tokens": 89,
+            "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "response_content": "It appears you've sent a very long string of the letter \"a\".  Is there anything I can help you with? Perhaps you accidentally hit a key repeatedly, or maybe you were testing something. \n\nI am here to assist if you have a question, need some text generated, want to brainstorm ideas, or just want to chat.  Just let me know what's on your mind!\n",
+            "error": null
+        },
+        {
+            "success": true,
+            "response_time": 9.266029834747314,
+            "prompt_tokens": 167,
+            "response_tokens": 72,
+            "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "response_content": "It appears you've sent a very long string of \"a\" characters.  Is there something specific you were trying to communicate? Perhaps you accidentally hit a key repeatedly? \n\nI can try to help if you tell me what you intended, or I can simply acknowledge that I received your message. Let me know!\n",
+            "error": null
+        },
+        {
+            "success": true,
+            "response_time": 17.681912660598755,
+            "prompt_tokens": 167,
+            "response_tokens": 187,
+            "prompt": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "response_content": "It appears you've sent a very long string of the letter \"a\".  Is there anything I can help you with? Perhaps you accidentally hit the 'a' key repeatedly, or maybe you were testing something? \n\nI'm here to assist with all sorts of tasks. Here are a few things I can do:\n\n* **Answer questions:**  I can provide information on a wide range of topics.\n* **Generate creative content:** I can write stories, poems, code, scripts, musical pieces, email, letters, etc.\n* **Translate languages.**\n* **Summarize text.**\n* **Have a conversation:** Just chat with me!\n\nLet me know if you'd like to try any of these things or if there was a reason for the long \"a\" sequence. I won\u2019t be offended if it was just an accident! \ud83d\ude0a\n",
+            "error": null
+        }
+    ]
+}
