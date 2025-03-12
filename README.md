@@ -1,349 +1,195 @@
-# Gemma 3 Setup and Usage
+# Gemma 3 OpenAI-Compatible Server
 
-This repository provides everything you need to work with Google's Gemma 3 models using Hugging Face and uv for environment management. It also supports loading local GGUF models using llama.cpp.
+This repository provides a complete solution for running Google's Gemma 3 models locally with an OpenAI-compatible API server. It leverages `llama-cpp-python` for efficient inference and `uv` for environment management.
 
-## Important Note
+## Features
 
-Gemma 3 models require a specialized version of the transformers library. This repository is configured to use the correct version:
-
-```bash
-git+https://github.com/huggingface/transformers@v4.49.0-Gemma-3
-```
-
-Some Gemma 3 models may require authentication with a Hugging Face API token.
+-   **OpenAI API Compatibility:** Use the server with any OpenAI client library or tools designed for the OpenAI API.
+-   **Gemma 3 Support:** Optimized for Gemma 3 models in GGUF format.
+-   **GPU Acceleration:**  Configurable GPU layer offloading for optimal performance.
+-   **Conversation Mode:** Supports multi-turn conversations with history.
+-   **Streaming Responses:**  Get real-time token generation for responsive applications.
+-   **Easy Setup:**  Simple installation and configuration with `uv` and a convenient start script.
+-   **Test Suite:** Includes a test suite for evaluating performance and context size limits.
 
 ## Contents
 
-- `requirements.txt` - All required dependencies, including `llama-cpp-python`
-- `setup_gemma3_env.sh` - Shell script to set up the environment using uv
-- `gemma3_example.py` - Example script demonstrating how to use Gemma 3 models (both Hugging Face and GGUF)
-- `gemma3_setup.py` - Detailed information about dependencies and setup options
-- `gemma3_report_2025-03-12_084449/` - Detailed documentation and project reports
+-   `requirements.txt`:  All required dependencies.
+-   `gemma3_server.py`:  The main server implementation using `llama-cpp-python`.
+-   `test_gemma3_server.py`:  A client script to test the server's functionality.
+-   `start_gemma3_server.sh`:  A shell script to easily start the server.
+-   `GEMMA3_SERVER_README.md`: Detailed documentation for the server.
+-   `tests/`:  Directory containing the test suite.
+    -   `tests/context_size_test.py`:  Script for testing context size and configuration parameters.
+    -   `tests/run_tests.sh`:  Script to run the test suite.
+    -   `tests/TODO.md`: TODO list for test suite development.
+-   `setup_gemma3_env.sh`: (Legacy) Shell script to set up the environment using uv.
+-   `gemma3_example.py`: (Legacy) Example script demonstrating how to use Gemma 3 models (both Hugging Face and GGUF).
+-   `gemma3_setup.py`: (Legacy) Detailed information about dependencies and setup options.
 
-## Setup Instructions
+## Setup
 
 ### Prerequisites
 
-- Python 3.9+ installed
-- Git (for cloning this repository)
-- Internet connection (for downloading models and dependencies)
-- (Optional) Hugging Face API token (for accessing gated models)
-- (Optional) C++ compiler (for building `llama-cpp-python` from source, if needed)
+-   Python 3.8+
+-   A compatible GGUF Gemma 3 model file (e.g., from Unsloth or TheBloke on Hugging Face).
+-   (Recommended) A GPU with sufficient VRAM for your chosen model and quantization.
 
-### Quick Setup
+### Installation
 
-The easiest way to set up your environment is to use the provided shell script:
+1.  **Clone the repository:**
 
-```bash
-# Make the script executable
-chmod +x setup_gemma3_env.sh
+    ```bash
+    git clone <repository_url>
+    cd <repository_directory>
+    ```
 
-# Run the setup script
-./setup_gemma3_env.sh
-```
+2.  **Install dependencies:**
 
-This script will:
+    ```bash
+    uv pip install -r requirements.txt
+    ```
+    This installs:
+    - `llama-cpp-python[server]`: The core library, including server components.
+    - `uvicorn`: An ASGI server to run the FastAPI application.
+    - `openai`: The OpenAI Python client library (for testing).
+    - `fastapi`: The web framework used by the server.
+    - `starlette`: ASGI toolkit.
+    - Other necessary dependencies.
 
-1. Install uv if not already installed
-2. Create a virtual environment
-3. Install all required dependencies (including the specialized transformers version and `llama-cpp-python`)
-4. Verify the installation
-5. Check for the presence of the `HF_TOKEN` environment variable
+## Running the Server
 
-### Manual Setup
-
-If you prefer to set up the environment manually:
-
-```bash
-# Install uv (if not already installed)
-curl -sSf https://install.ultraviolet.dev | sh
-
-# Create a virtual environment
-uv venv .venv
-
-# Activate the environment
-source .venv/bin/activate
-
-# Install dependencies
-uv pip install -r requirements.txt
-```
-
-### Hugging Face API Token
-
-Some Gemma 3 models may require authentication with a Hugging Face API token. You can obtain a token from your Hugging Face account settings: [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
-
-You can provide the token in two ways:
-
-1. **Environment Variable (Recommended)**: Set the `HF_TOKEN` environment variable:
-
-   ```bash
-   export HF_TOKEN=your_hugging_face_token
-   ```
-
-2. **Command-Line Argument**: Use the `--token` argument when running `gemma3_example.py`:
-
-   ```bash
-   python gemma3_example.py --token your_hugging_face_token
-   ```
-
-The setup script will check for the `HF_TOKEN` environment variable and provide a warning if it's not set.
-
-## Using Gemma 3 Models
-
-### Running the Example Script
-
-After setting up the environment, you can run the example script:
+The recommended way to start the server is with the provided `start_gemma3_server.sh` script:
 
 ```bash
-# Activate the environment (if not already activated)
-source .venv/bin/activate
+./start_gemma3_server.sh --model_path /path/to/your/gemma-3-model.gguf --n_gpu_layers -1
 ```
 
-### Using Hugging Face Models
+Replace `/path/to/your/gemma-3-model.gguf` with the actual path to your downloaded GGUF model file.  `--n_gpu_layers -1` offloads all layers to the GPU (recommended if you have enough VRAM).
 
-To use a Hugging Face model:
+**Available Options:**
+
+-   `--model_path`:  **(Required)** Path to the GGUF model file.
+-   `--n_gpu_layers`:  Number of layers to offload to the GPU.  Use -1 to offload all layers. (Default: -1)
+-   `--context_length`:  The maximum context size (in tokens) the model can handle. (Default: 2048)
+-   `--host`:  The host address to bind the server to. (Default: 127.0.0.1)
+-   `--port`:  The port to run the server on. (Default: 8000)
+
+The server will be accessible at `http://127.0.0.1:8000` (or the host/port you specified).
+
+## Testing the Server
+
+### Basic Test Script
+
+A simple test script (`test_gemma3_server.py`) is included to verify the server is working:
 
 ```bash
-# Run with default settings (Gemma 3 8B, 4-bit quantization)
-python gemma3_example.py
-
-# Use a different model
-python gemma3_example.py --model google/gemma-3-27b
-
-# Use the instruction-tuned 1B model
-python gemma3_example.py --model google/gemma-3-1b-it
-
-# Use a custom prompt
-python gemma3_example.py --prompt "Write a short poem about AI"
-
-# Adjust generation parameters
-python gemma3_example.py --max_tokens 1024 --temperature 0.9 --top_p 0.95
-
-# Change quantization level
-python gemma3_example.py --quantize 8bit  # Options: 4bit, 8bit, none
-
-# Provide Hugging Face token (if not using HF_TOKEN environment variable)
-python gemma3_example.py --token your_hugging_face_token
+uv run python test_gemma3_server.py --prompt "Hello, what can you do?"
 ```
 
-### Using Local GGUF Models
+This sends a single prompt to the server and prints the response.
 
-To use a local GGUF model (like those from Unsloth):
+**Options:**
+
+- `--prompt`: The prompt text.
+- `--conversation`:  Run in interactive conversation mode.
+- `--stream`: Enable streaming responses.
+- `--temperature`:  Adjust the randomness of the generated text (higher values are more random).
+- `--top_p`:  Use nucleus sampling (controls the diversity of the generated text).
+- `--max_tokens`:  Limit the maximum number of tokens in the response.
+
+### Interactive Conversation Mode
 
 ```bash
-# Run with a local GGUF model
-python gemma3_example.py --local_model /path/to/your/model.gguf
-
-# Specify the number of GPU layers (use -1 for all available layers)
-python gemma3_example.py --local_model /path/to/your/model.gguf --n_gpu_layers 40
-
-# Adjust context length
-python gemma3_example.py --local_model /path/to/your/model.gguf --context_length 4096
-
-# Use a custom prompt
-python gemma3_example.py --local_model /path/to/your/model.gguf --prompt "Write a short story"
-
-# Use Unsloth's recommended parameters (these are the defaults for GGUF)
-python gemma3_example.py --local_model /path/to/your/model.gguf --temperature 1.0 --top_k 64 --top_p 0.95 --min_p 0.01 --repeat_penalty 1.0
+uv run python test_gemma3_server.py --conversation
 ```
 
-**Note**: When using a local GGUF model, the `--model`, `--quantize`, and `--token` arguments are ignored.
+This starts an interactive chat session.  You can type messages, and the server will respond, maintaining conversation history.  Use `exit` or `quit` to end the session, `save` to save the conversation, and `history` to view the conversation history.
 
-**Unsloth Recommended Parameters (for GGUF)**:
+### Test Suite
 
-- `--temperature 1.0`
-- `--top_k 64`
-- `--top_p 0.95`
-- `--min_p 0.01` (or `--min_p 0.0`)
-- `--repeat_penalty 1.0`
-
-These are set as defaults when using `--local_model`.
-
-**Chat Template (IMPORTANT)**:
-
-The Gemma 3 models use the following chat template:
-
-```jinja
-<start_of_turn>user
-YOUR PROMPT HERE<end_of_turn>
-<start_of_turn>model
-
-```
-
-**Do NOT include `<bos>` at the beginning when using GGUF models with llama.cpp, as it's automatically added.** For Hugging Face models, include `<bos>`. The example script handles this automatically.
-
-**Example (Flappy Bird)**:
+A more comprehensive test suite is available in the `tests` directory.  This suite allows you to test different configurations and measure performance.
 
 ```bash
-python gemma3_example.py --local_model /Users/sarda/.lmstudio/models/unsloth/gemma-3-27b-it-GGUF/gemma-3-27b-it-Q4_K_M.gguf --prompt "Create a Flappy Bird game in Python. You must include these things:\n1. You must use pygame.\n2. The background color should be randomly chosen and is a light shade. Start with a light blue color.\n3. Pressing SPACE multiple times will accelerate the bird.\n4. The bird's shape should be randomly chosen as a square, circle or triangle. The color should be randomly chosen as a dark color.\n5. Place on the bottom some land colored as dark brown or yellow chosen randomly.\n6. Make a score shown on the top right side. Increment if you pass pipes and don't hit them.\n7. Make randomly spaced pipes with enough space. Color them randomly as dark green or light brown or a dark gray shade.\n8. When you lose, show the best score. Make the text inside the screen. Pressing q or Esc will quit the game. Restarting is pressing SPACE again.\nThe final game should be inside a markdown section in Python. Check your code for errors and fix them before the final markdown section." --n_gpu_layers -1
+./tests/run_tests.sh --model_path /path/to/your/gemma-3-model.gguf --n_gpu_layers -1
 ```
 
-## Available Models
+**Options:**
 
-### Hugging Face Models
+The `tests/run_tests.sh` script uses the same options as `start_gemma3_server.sh`, plus:
 
-Gemma 3 is available in different sizes on Hugging Face:
+-   `--max_tokens`:  Maximum tokens for the generated responses.
+-   `--prompt_size`:  The size of the prompt (in characters) to use for testing.
+-   `--num_tests`:  The number of test iterations to run.
+-   `--output_file`:  The file to save the test results to (default: `tests/test_results.json`).
 
-- `google/gemma-3-8b` - 8 billion parameter model (recommended for most users)
-- `google/gemma-3-27b` - 27 billion parameter model (higher quality, requires more resources)
-- `google/gemma-3-1b-it` - 1 billion parameter instruction-tuned model (fastest, good for simple tasks)
+The test suite starts the server, sends requests with varying prompt sizes, measures response times, and checks for errors.  The results are saved to a JSON file.
 
-### GGUF Models
+## Using the API
 
-You can find GGUF models for Gemma 3 on Hugging Face, often in repositories from users like TheBloke and Unsloth. You'll need to download these models separately.
+The server provides an OpenAI-compatible API.  You can use it with any OpenAI client library (like the `openai` Python package) by setting the `base_url` to your server's address.
 
-## Hardware Requirements
-
-### Hugging Face Models
-
-The hardware requirements depend on the model size and quantization level:
-
-#### 4-bit Quantization (default)
-
-- **8B model**: 6GB+ VRAM
-- **27B model**: 20GB+ VRAM
-- **1B-IT model**: 2GB+ VRAM
-
-#### 8-bit Quantization
-
-- **8B model**: 12GB+ VRAM
-- **27B model**: 40GB+ VRAM
-- **1B-IT model**: 4GB+ VRAM
-
-#### Full Precision (no quantization)
-
-- **8B model**: 24GB+ VRAM
-- **27B model**: 80GB+ VRAM
-- **1B-IT model**: 8GB+ VRAM
-
-### GGUF Models
-
-The hardware requirements for GGUF models depend on the specific quantization used (e.g., Q4_K_M, Q5_K_M, etc.). Refer to the documentation for the specific GGUF model you're using. Generally, GGUF models with smaller quantization levels require less VRAM.
-
-## Using in Your Own Code
-
-### Hugging Face Model Example
+**Example (Python):**
 
 ```python
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
-import os
+from openai import OpenAI
 
-# Load tokenizer and model
-model_name = "google/gemma-3-8b"  # or "google/gemma-3-27b" or "google/gemma-3-1b-it"
-
-# Get Hugging Face token from environment variable
-hf_token = os.environ.get("HF_TOKEN")
-
-tokenizer = AutoTokenizer.from_pretrained(model_name, token=hf_token)
-
-# Use 4-bit quantization for efficiency
-model = AutoModelForCausalLM.from_pretrained(
-    model_name,
-    device_map="auto",
-    load_in_4bit=True,
-    quantization_config=BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_compute_dtype=torch.bfloat16,
-        bnb_4bit_quant_type="nf4",
-    ),
-    token=hf_token,
+client = OpenAI(
+    base_url="http://127.0.0.1:8000/v1",  # Replace with your server's address
+    api_key="sk-no-key-required",  # Any string works as the API key
 )
 
-# Generate text (include <bos> for HF models)
-prompt = "<bos><start_of_turn>user\nExplain quantum computing in simple terms<end_of_turn>\n<start_of_turn>model\n"
-inputs = tokenizer(prompt, return_tensors="pt").to(model.device)
-outputs = model.generate(
-    **inputs,
-    max_new_tokens=512,
-    temperature=0.7,
-    top_p=0.9,
+# Single turn
+response = client.chat.completions.create(
+    model="gemma-3",  # The model name doesn't matter; the server uses the loaded model
+    messages=[
+        {"role": "user", "content": "What is the capital of France?"},
+    ],
+    max_tokens=50,
 )
-response = tokenizer.decode(outputs[0][inputs.input_ids.shape[1]:], skip_special_tokens=True)
-print(response)
+print(response.choices[0].message.content)
+
+# Multi-turn conversation
+messages = [
+    {"role": "user", "content": "What is the capital of France?"},
+]
+response = client.chat.completions.create(
+    model="gemma-3",
+    messages=messages,
+    max_tokens=50,
+)
+messages.append({"role": "assistant", "content": response.choices[0].message.content})
+messages.append({"role": "user", "content": "What is its population?"})
+response = client.chat.completions.create(
+    model="gemma-3",
+    messages=messages,
+    max_tokens=50,
+)
+print(response.choices[0].message.content)
+
 ```
 
-### GGUF Model Example
+**cURL Example:**
 
-```python
-from llama_cpp import Llama
-
-# Load the GGUF model
-model_path = "/path/to/your/model.gguf"
-model = Llama(model_path=model_path, n_gpu_layers=-1, n_ctx=2048) # Use -1 for all GPU layers
-
-# Generate text (do NOT include <bos> for GGUF models)
-prompt = "<start_of_turn>user\nExplain quantum computing in simple terms<end_of_turn>\n<start_of_turn>model\n"
-output = model(
-    prompt,
-    max_tokens=512,
-    temperature=1.0,  # Unsloth recommended
-    top_p=0.95,       # Unsloth recommended
-    top_k=64,         # Unsloth recommended
-    min_p=0.01,       # Unsloth recommended
-    repeat_penalty=1.0, # Unsloth recommended
-    echo=False,
-)
-response = output["choices"][0]["text"]
-print(response)
+```bash
+curl http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gemma-3",
+    "messages": [{"role": "user", "content": "What is the capital of France?"}],
+    "max_tokens": 50
+  }'
 ```
+
+For detailed API documentation, refer to the `GEMMA3_SERVER_README.md` file.
+
+## Using with Roo Code
+
+1.  Start the server using `start_gemma3_server.sh`.
+2.  Configure Roo Code to use the following settings:
+    *   **API Base URL:** `http://127.0.0.1:8000/v1` (or the address where your server is running)
+    *   **API Key:**  Any string (e.g., "sk-no-key-required")
 
 ## Troubleshooting
 
-### Common Issues
-
-1. **Out of Memory Errors**
-
-   - Try using a smaller model (e.g., 1B-IT instead of 8B, or a GGUF model with smaller quantization)
-   - Use 4-bit quantization instead of 8-bit or full precision (for Hugging Face models)
-   - Reduce batch size or sequence length
-   - Reduce the context length (`--context_length`) for GGUF models
-   - Increase the number of GPU layers (`--n_gpu_layers`) for GGUF models if you have more VRAM available
-
-2. **Slow Generation**
-
-   - Use a smaller model
-   - Reduce the number of generated tokens
-   - Ensure you're using GPU acceleration if available
-   - Use a GGUF model with appropriate quantization for your hardware
-
-3. **Installation Problems**
-
-   - Make sure you're using the specialized transformers version
-   - Check that all dependencies are installed correctly
-   - Verify that your Python version is 3.9 or higher
-   - If installing `llama-cpp-python` from source, ensure you have a C++ compiler installed
-
-4. **Authentication Errors**
-
-   - Ensure you have a valid Hugging Face API token
-   - Set the `HF_TOKEN` environment variable correctly
-   - Use the `--token` argument when running the example script
-
-5. **Model Not Found Errors**
-
-   - Double-check the model name (for Hugging Face models) or path (for GGUF models)
-   - Make sure you've downloaded the GGUF model file
-
-6. **TypeError: generate_text_gguf() takes ... arguments but ... were given**
-   - Make sure you are using the latest version of `gemma3_example.py`. This error should be fixed.
-
-### Getting Help
-
-For more detailed information, refer to the documentation in the `gemma3_report_2025-03-12_084449/` directory:
-
-- `completion_report.md` - Comprehensive project overview
-- `project_summary.md` - Quick reference guide
-- `todo.md` - Future enhancements and known limitations
-
-## License
-
-This project is provided as-is under the MIT License. The Gemma 3 models themselves are subject to Google's model license, which you should review before using the models.
-
-## Acknowledgments
-
-- Google for creating the Gemma 3 models
-- Hugging Face for providing model hosting and the transformers library
-- The uv team for creating an excellent environment management tool
-- The llama.cpp team for creating a powerful inference engine for GGUF models
-- Unsloth AI for providing optimized GGUF models and usage recommendations
+See `GEMMA3_SERVER_README.md` for troubleshooting tips and common issues.
