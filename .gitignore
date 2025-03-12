@@ -1,0 +1,120 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+ENV/
+
+# uv specific
+.uv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Hugging Face specific
+.cache/
+.huggingface/
+hub/
+cached_*
+
+# Model files (often large)
+*.bin
+*.pt
+*.pth
+*.onnx
+*.safetensors
+*.gguf
+
+# Logs and databases
+*.log
+*.sqlite
+*.db
+logs/
+wandb/
+
+# OS specific
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary files
+tmp/
+temp/
+
+# Generated files
+generated/
+output/
+
+# Tensorboard
+runs/
+
+# PyTorch Lightning
+lightning_logs/
+
+# Test coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# Documentation
+docs/_build/
+site/
+
+# Profiling data
+prof/
+*.prof
+
+# Weights & Biases
+wandb/
+
+# MLflow
+mlruns/
+
+# DVC
+.dvc/
+
+# Hydra
+outputs/
+multirun/
+
+# Ray
+ray_results/
+
+# Accelerate
+accelerate-disk-cache/
+
+# Gemma 3 specific
+gemma3_models/
+gemma3_outputs/
